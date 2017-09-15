@@ -54,7 +54,7 @@ public class ChatWebSocketHandler {
 	                Chat.broadcastMessage( cmd, null, null, null );
 	    	}else if( "/MSG".equals(cmd.toUpperCase()) ) {
 
-					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = param, sayDate);
+					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = sanitize4Html(param), sayDate);
 
 	    		Chat.broadcastMessage( cmd, sender,msg, sayDate );
 	    	}
@@ -62,5 +62,14 @@ public class ChatWebSocketHandler {
 			// TODO 自動生成された catch ブロック
 			e.printStackTrace();
 		}
+    }
+
+    private String sanitize4Html(String src){
+    	src = src.replaceAll("&" , "&amp;" );
+    	src = src.replaceAll("<" , "&lt;"  );
+    	src = src.replaceAll(">" , "&gt;"  );
+    	src = src.replaceAll("\"", "&quot;");
+    	src = src.replaceAll("'" , "&#39;" );
+    	return src;
     }
 }

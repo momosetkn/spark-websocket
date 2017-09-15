@@ -7,7 +7,16 @@ webSocket.onopen = function () {
 	sendMessage( '/member '+nick);
 	sendMessage( '/log');
 };
-webSocket.onclose = function () { alert("WebSocket connection closed") };
+webSocket.onclose = function () {
+	webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/chat");
+	webSocket.onmessage = function (msg) { updateChat(msg); };
+	webSocket.onopen = function () {
+		var params = getQueryString();
+		var nick = params['nick'];
+		sendMessage( '/member '+nick);
+	};
+};
+//alert("WebSocket connection closed") };
 
 //Send message if "Send" is clicked
 /*id("send").addEventListener("click", function () {
@@ -38,7 +47,7 @@ function updateChat(msg) {
     }else if( "/msg"==data.cmd ||"/log"==data.cmd ){
     	var msg = new String(data.message).replace(/\n/g,'<br>');
     	var msgHtml = "<article><b>"+data.sender+" says:</b><span class='timestamp'>"+data.saydate+"</span><div>"+msg+"</div></article>"
-    	insert("chatlogs", msgHtml);
+    	insert("chatlogs", '<pre>'+msgHtml+'</pre>');
     	var chatlogs = document.getElementById("chatlogs");
     	chatlogs.scrollTop = chatlogs.scrollHeight;//TODO ログ読んでるときはスクロールしないようにしたい
     	//insert("chatlogs", data.userMessage);
