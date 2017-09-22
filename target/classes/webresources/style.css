@@ -9,9 +9,7 @@ html {
 body {
     font-family: monospace;
     font-size: 14px;
-    max-width: 480px;
     margin: 0 auto;
-    //padding: 20px
 }
 
 textarea {
@@ -19,6 +17,7 @@ textarea {
     padding: 5px;
     margin: 5px 0;
     resize: none;
+    height: 60px;
 }
 
 button {
@@ -36,23 +35,25 @@ li {
 }*/
 
 #userlist {
-    position: fixed;
-    left: 50%;
     list-style: none;
-    margin-left: 250px;
-    background: #f0f0f9;
-    padding: 5px 10px;
+    background: #f0f0f0;
+    padding: 10px;
+    border: 2px solid #c0c0c0;
+    border-radius: 5px;
+    margin: 10px;
+    padding: 5px;
     width: 150px;
     top: 11px;
 }
 
 #chatlogs {
 	overflow-y:scroll;
+	width: 100%;
 }
 
 #chatlogs p {
     margin: 5px 0;
-    font-weight: 300
+    font-weight: 300;
 }
 
 #chatlogs .timestamp {
@@ -63,19 +64,19 @@ li {
 }
 
 #chatlogs article {
-    background: #f1f1f1;
+    background: #f0f0f0;
     padding: 10px;
-    margin: 10px 0;
-    border-left: 5px solid #aaa;
+    margin: 5px 10px;
+    border: 2px solid #c0c0c0;
+    border-radius: 5px;
     position: relative;
     word-wrap: break-word;
 }
 
 #chatlogs article:last-of-type {
-    //background: #c9edc3;
-    //border-left-color: #74a377;
     animation: enter .2s 1;
 }
+
 
 @keyframes enter {
     from { transform: none;        }

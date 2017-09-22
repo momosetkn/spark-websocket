@@ -57,6 +57,16 @@
     <version>1.5.4</version>
 </dependency>
 
+<!-- https://mvnrepository.com/artifact/com.vladsch.flexmark/flexmark-all -->
+<dependency>
+    <groupId>com.vladsch.flexmark</groupId>
+    <artifactId>flexmark-all</artifactId>
+    <version>0.27.0</version>
+</dependency>
+
+
+
+
 
     </dependencies>
 

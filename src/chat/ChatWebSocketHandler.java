@@ -1,5 +1,6 @@
 package chat;
 import java.sql.SQLException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -9,6 +10,18 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
+
+import com.vladsch.flexmark.ast.Document;
+import com.vladsch.flexmark.ext.abbreviation.AbbreviationExtension;
+import com.vladsch.flexmark.ext.definition.DefinitionExtension;
+import com.vladsch.flexmark.ext.footnotes.FootnoteExtension;
+import com.vladsch.flexmark.ext.tables.TablesExtension;
+import com.vladsch.flexmark.ext.typographic.TypographicExtension;
+import com.vladsch.flexmark.html.HtmlRenderer;
+import com.vladsch.flexmark.parser.Parser;
+import com.vladsch.flexmark.parser.ParserEmulationProfile;
+import com.vladsch.flexmark.util.options.MutableDataHolder;
+import com.vladsch.flexmark.util.options.MutableDataSet;
 
 import chat.db.Log;
 import chat.util.DateUtils;
@@ -53,8 +66,7 @@ public class ChatWebSocketHandler {
 	                Chat.userUsernameMap.put(user, param);
 	                Chat.broadcastMessage( cmd, null, null, null );
 	    	}else if( "/MSG".equals(cmd.toUpperCase()) ) {
-
-					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = sanitize4Html(param), sayDate);
+					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = mrkDownToHtml(param), sayDate);
 
 	    		Chat.broadcastMessage( cmd, sender,msg, sayDate );
 	    	}
@@ -64,12 +76,21 @@ public class ChatWebSocketHandler {
 		}
     }
 
-    private String sanitize4Html(String src){
-    	src = src.replaceAll("&" , "&amp;" );
-    	src = src.replaceAll("<" , "&lt;"  );
-    	src = src.replaceAll(">" , "&gt;"  );
-    	src = src.replaceAll("\"", "&quot;");
-    	src = src.replaceAll("'" , "&#39;" );
-    	return src;
+    private String mrkDownToHtml(String src){
+    	MutableDataHolder options =
+    			new MutableDataSet()
+    			.setFrom(ParserEmulationProfile.GITHUB_DOC)
+    			.set(Parser.EXTENSIONS, Arrays.asList(
+                        AbbreviationExtension.create(),
+                        DefinitionExtension.create(),
+                        FootnoteExtension.create(),
+                        TablesExtension.create(),
+                        TypographicExtension.create()
+                        ));;
+    	Parser parser = Parser.builder(options).build();
+    	Document doc = parser.parse(src);
+    	HtmlRenderer renderer = HtmlRenderer.builder(options).build();
+    	String html = renderer.render(doc);
+    	return html;
     }
 }

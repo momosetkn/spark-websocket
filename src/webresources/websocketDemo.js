@@ -1,32 +1,21 @@
 //Establish the WebSocket connection and set up event handlers
-var webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/chat");
-webSocket.onmessage = function (msg) { updateChat(msg); };
-webSocket.onopen = function () {
-	var params = getQueryString();
-	var nick = params['nick'];
-	sendMessage( '/member '+nick);
-	sendMessage( '/log');
-};
-webSocket.onclose = function () {
+var webSocket = null;
+
+var webSocketInit = function () {
 	webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/chat");
 	webSocket.onmessage = function (msg) { updateChat(msg); };
 	webSocket.onopen = function () {
 		var params = getQueryString();
 		var nick = params['nick'];
 		sendMessage( '/member '+nick);
+		sendMessage( '/log');
+	};
+	webSocket.onclose = function () {
+		webSocket = null;
+	    setTimeout("webSocketInit()", 1500);
 	};
 };
-//alert("WebSocket connection closed") };
-
-//Send message if "Send" is clicked
-/*id("send").addEventListener("click", function () {
-    sendMessage('/msg '+id("message").value);
-});*/
-
-//Send message if enter is pressed in the input field
-/*id("message").addEventListener("keypress", function (e) {
-    if (e.keyCode === 13) { sendMessage('/msg '+e.target.value); }
-});*/
+webSocketInit();
 
 //Send a message if it's not empty, then clear the input field
 function sendMessage(message) {
@@ -45,12 +34,11 @@ function updateChat(msg) {
             insert("userlist", "<li>" + user + "</li>");
         });
     }else if( "/msg"==data.cmd ||"/log"==data.cmd ){
-    	var msg = new String(data.message).replace(/\n/g,'<br>');
+    	var msg = data.message;
     	var msgHtml = "<article><b>"+data.sender+" says:</b><span class='timestamp'>"+data.saydate+"</span><div>"+msg+"</div></article>"
-    	insert("chatlogs", '<pre>'+msgHtml+'</pre>');
+    	insert("chatlogs", msgHtml);
     	var chatlogs = document.getElementById("chatlogs");
     	chatlogs.scrollTop = chatlogs.scrollHeight;//TODO ログ読んでるときはスクロールしないようにしたい
-    	//insert("chatlogs", data.userMessage);
     }
 }
 
@@ -107,7 +95,7 @@ function getQueryString()
 	document.getElementById("message").onkeydown = msgKeypress;
 	function msgKeypress(e) {
 	    if (e.which == 13) {
-	        if (e.altKey) {
+	        if (e.altKey || e.shiftKey) {
 	            // alt + Enter -> CrLf
 	            var first = e.currentTarget.value.substring(0, e.currentTarget.selectionStart);
 	            var second = e.currentTarget.value.substr(e.currentTarget.selectionEnd);
@@ -116,8 +104,10 @@ function getQueryString()
 	            e.currentTarget.selectionEnd = first.length + 1;
 	            return false;
 	        } else {
-	        	//msg = msg.replace(/\n/g, '<br>');
-	        	sendMessage('/msg '+e.target.value);
+	        	var msg = e.target.value;
+	        	if( msg ){
+	        		sendMessage('/msg '+msg);
+	        	}
 	            // Enter key not working
 	            return false;
 	        }
