@@ -64,6 +64,14 @@
     <version>0.27.0</version>
 </dependency>
 
+<!-- https://mvnrepository.com/artifact/net.java.dev.textile-j/textile-j -->
+<dependency>
+    <groupId>net.java.dev.textile-j</groupId>
+    <artifactId>textile-j</artifactId>
+    <version>2.2.864</version>
+</dependency>
+
+
 
 
 

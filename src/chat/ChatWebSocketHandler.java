@@ -1,4 +1,5 @@
 package chat;
+import java.io.StringWriter;
 import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
@@ -25,6 +26,9 @@ import com.vladsch.flexmark.util.options.MutableDataSet;
 
 import chat.db.Log;
 import chat.util.DateUtils;
+import net.java.textilej.parser.MarkupParser;
+import net.java.textilej.parser.builder.HtmlDocumentBuilder;
+import net.java.textilej.parser.markup.textile.TextileDialect;
 
 @WebSocket
 public class ChatWebSocketHandler {
@@ -66,7 +70,7 @@ public class ChatWebSocketHandler {
 	                Chat.userUsernameMap.put(user, param);
 	                Chat.broadcastMessage( cmd, null, null, null );
 	    	}else if( "/MSG".equals(cmd.toUpperCase()) ) {
-					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = mrkDownToHtml(param), sayDate);
+					Chat.logDao.insert(sender = Chat.userUsernameMap.get(user),  msg = textToHtml(param), sayDate);
 
 	    		Chat.broadcastMessage( cmd, sender,msg, sayDate );
 	    	}
@@ -93,4 +97,17 @@ public class ChatWebSocketHandler {
     	String html = renderer.render(doc);
     	return html;
     }
+
+	private String textToHtml(String textile){
+		StringWriter sw = new StringWriter();
+
+		HtmlDocumentBuilder builder = new HtmlDocumentBuilder(sw);
+		builder.setEmitAsDocument(false);
+
+		MarkupParser parser = new MarkupParser(new TextileDialect());
+		parser.setBuilder(builder);
+		parser.parse(textile);
+
+		return sw.toString();
+	}
 }
