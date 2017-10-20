@@ -99,7 +99,22 @@ public class ChatWebSocketHandler {
     }
 
 	private String textToHtml(String textile){
-		StringWriter sw = new StringWriter();
+		textile = textile.trim();
+		//コード表示の場合はtexile変換しない
+		Pattern p = Pattern.compile("(<pre><code>)(.*)(</code></pre>)",  Pattern.DOTALL);
+		Matcher m = p.matcher(textile);
+		if( m.find() ){
+			String rep = m.group(2);
+			rep = convertSanitize(rep);
+			textile = m.replaceAll("$1"+rep+"$3");
+			return textile;
+		}else{
+			return toTextileHtml(textile);
+		}
+	}
+
+    private String toTextileHtml(String textile){
+    	StringWriter sw = new StringWriter();
 
 		HtmlDocumentBuilder builder = new HtmlDocumentBuilder(sw);
 		builder.setEmitAsDocument(false);
@@ -110,4 +125,38 @@ public class ChatWebSocketHandler {
 
 		return sw.toString();
 	}
+
+    /**
+     * タグを無害化します。
+     * @param str
+     * @return
+     */
+    private static String convertSanitize( String str ) {
+        if(str==null) {
+            return str;
+        }
+        str = str.replaceAll("&" , "&amp;" );
+        str = str.replaceAll("<" , "&lt;"  );
+        str = str.replaceAll(">" , "&gt;"  );
+        str = str.replaceAll("\"", "&quot;");
+        str = str.replaceAll("'" , "&#39;" );
+        return str;
+     }
+
+    /**
+     * 無害化されたタグを元に戻します
+     * @param str
+     * @return
+     */
+    private static String convertUnsanitize( String str ) {
+        if(str==null) {
+            return str;
+        }
+        str = str.replaceAll("&#39;" , "'" );
+        str = str.replaceAll("&quot;", "\"");
+        str = str.replaceAll("&gt;"  , ">" );
+        str = str.replaceAll("&lt;"  , "<" );
+        str = str.replaceAll("&amp;" , "&" );
+        return str;
+     }
 }

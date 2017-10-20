@@ -2,6 +2,7 @@
 var webSocket = null;
 
 var webSocketInit = function () {
+	id('chatlogs').innerHTML = '';
 	webSocket = new WebSocket("ws://" + location.hostname + ":" + location.port + "/chat");
 	webSocket.onmessage = function (msg) { updateChat(msg); };
 	webSocket.onopen = function () {
@@ -35,16 +36,19 @@ function updateChat(msg) {
         });
     }else if( "/msg"==data.cmd ||"/log"==data.cmd ){
     	var msg = data.message;
-    	var msgHtml = "<article><b>"+data.sender+" says:</b><span class='timestamp'>"+data.saydate+"</span><div>"+msg+"</div></article>"
+    	var msgHtml = "<article><b>"+data.sender+" says:</b><span class='timestamp'>"+data.saydate+"</span><div class='msgContent'>"+msg+"</div></article>"
     	insert("chatlogs", msgHtml);
     	var chatlogs = document.getElementById("chatlogs");
     	chatlogs.scrollTop = chatlogs.scrollHeight;//TODO ログ読んでるときはスクロールしないようにしたい
+    	var msgContentTag = id('chatlogs').lastElementChild.getElementsByClassName("msgContent");
+    	hljs.highlightBlock( msgContentTag[0] );
     }
 }
 
 //Helper function for inserting HTML as the first child of an element
 function insert(targetId, message) {
     id(targetId).insertAdjacentHTML("beforeend", message);
+     //hljs.initHighlightingOnLoad();
 }
 
 //Helper function for selecting element by id
@@ -113,6 +117,10 @@ function getQueryString()
 	        }
 	    }
 	};
+	document.getElementById("message").oncontextmenu = function(e){
+		e.target.value = e.target.value + '<pre><code>'+CRLF+CRLF+'</code></pre>';
+		return false;
+	}
 
 })();
 

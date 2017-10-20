@@ -26,7 +26,7 @@ public class LogDao {
 			//conn.createQuery("create sequence disp_no_seq").executeUpdate();;
 			conn.createQuery("drop table if exists log").executeUpdate();;
 			//conn.createQuery("create table log(id identity default disp_no.nextval not null, msg varchar(1024),pk(id) )").executeUpdate();;
-			conn.createQuery("create table log(disp_no bigint auto_increment, sender varchar(128), msg varchar(1024), saydate varchar(19) )").executeUpdate();;
+			conn.createQuery("create table log(disp_no bigint auto_increment, sender varchar(128), msg varchar, saydate varchar(19) )").executeUpdate();;
 			//conn.createQuery("create table log(disp_no int , msg varchar(1024) )");
 		}
 	}
